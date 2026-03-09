@@ -1,6 +1,6 @@
 {
   "name": "freqlink",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Terminal-based encrypted messaging over frequency-based channels",
   "type": "module",
   "main": "server/index.js",
