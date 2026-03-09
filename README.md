@@ -20,11 +20,8 @@ A public relay is already running. You and your peer both run the command above,
 > /connect
   ✓ Connected to relay node
 
-> /join 145.80
-  Joined frequency 145.80 MHz
-
 > /join 145.80 --key NIGHTFALL
-  Joined frequency 145.80 MHz with passphrase
+  Joined frequency 145.80 MHz
 
 > Hello
 [falcon-node]: Hello
@@ -41,8 +38,7 @@ A public relay is already running. You and your peer both run the command above,
 | Command | Description |
 |---|---|
 | `/connect` | Connect to the relay server |
-| `/join <freq>` | Join a frequency (e.g., `/join 145.80`) |
-| `/join <freq> --key <secret>` | Join with a passphrase for layered encryption |
+| `/join <freq> --key <secret>` | Join a frequency with a passphrase (required) |
 | `/leave` | Leave the current frequency |
 | `/peers` | List peers on the current frequency |
 | `/dm <peer> <message>` | Send an encrypted direct message |

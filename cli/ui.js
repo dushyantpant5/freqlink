@@ -197,8 +197,7 @@ export function printHelp() {
   console.log(chalk.cyan('  Available commands:'));
   const cmds = [
     ['/connect', 'Connect to the relay server'],
-    ['/join <freq>', 'Join a frequency (e.g., /join 145.80)'],
-    ['/join <freq> --key <secret>', 'Join with a passphrase for encryption'],
+    ['/join <freq> --key <secret>', 'Join a frequency with a passphrase (required)'],
     ['/leave', 'Leave the current frequency'],
     ['/peers', 'List peers on the current frequency'],
     ['/dm <peer> <message>', 'Send a direct message to a peer'],

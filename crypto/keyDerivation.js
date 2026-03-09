@@ -20,13 +20,13 @@ export function deriveSessionKey(sharedSecret, frequency) {
   const salt = Buffer.from(CRYPTO.HKDF_SALT, 'utf8');
   const info = Buffer.from(`freqlink-${frequency}`, 'utf8');
 
-  return crypto.hkdfSync(
+  return Buffer.from(crypto.hkdfSync(
     CRYPTO.HKDF_HASH,
     sharedSecret,
     salt,
     info,
     CRYPTO.KEY_BYTES
-  );
+  ));
 }
 
 /**
@@ -68,13 +68,13 @@ export function combineKeys(sessionKey, passphraseKey, frequency) {
   const info = Buffer.from(`freqlink-combined-${frequency}`, 'utf8');
   const salt = Buffer.from('freqlink-combined', 'utf8');
 
-  const combined = crypto.hkdfSync(
+  const combined = Buffer.from(crypto.hkdfSync(
     CRYPTO.HKDF_HASH,
     xored,
     salt,
     info,
     CRYPTO.KEY_BYTES
-  );
+  ));
 
   wipeBuffer(xored);
   return combined;

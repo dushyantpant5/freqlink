@@ -121,7 +121,7 @@ export function createCommandHandler({ connection, state, setPrompt, quit }) {
     }
 
     if (args.length < 1) {
-      printError('Usage: /join <frequency> [--key <passphrase>]');
+      printError('Usage: /join <frequency> --key <passphrase>');
       return;
     }
 
@@ -144,23 +144,21 @@ export function createCommandHandler({ connection, state, setPrompt, quit }) {
       return;
     }
 
-    // Parse optional --key flag
-    let passphrase = null;
+    // Parse required --key flag
     const keyIdx = args.indexOf('--key');
-    if (keyIdx !== -1 && args[keyIdx + 1]) {
-      passphrase = args[keyIdx + 1];
+    if (keyIdx === -1 || !args[keyIdx + 1]) {
+      printError('A passphrase is required. Use: /join <frequency> --key <passphrase>');
+      return;
     }
+    const passphrase = args[keyIdx + 1];
 
     // Generate ECDH key pair
     const { privateKey, publicKeyBase64 } = generateKeyPair();
     state.privateKey = privateKey;
     state.publicKeyBase64 = publicKeyBase64;
 
-    // Derive passphrase key if provided
-    if (passphrase) {
-      printSystem('Deriving key from passphrase...');
-      state.passphraseKey = derivePassphraseKey(passphrase, frequency);
-    }
+    printSystem('Deriving key from passphrase...');
+    state.passphraseKey = derivePassphraseKey(passphrase, frequency);
 
     state.frequency = frequency;
 
