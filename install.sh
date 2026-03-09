@@ -65,4 +65,4 @@ fi
 success "Launching FreqLink..."
 echo ""
 
-exec npx --yes freqlink
+exec npx --yes freqlink </dev/tty
