@@ -1,0 +1,19 @@
+{
+  "name": "freqlink",
+  "version": "1.0.0",
+  "description": "Terminal-based encrypted messaging over frequency-based channels",
+  "type": "module",
+  "main": "cli/index.js",
+  "scripts": {
+    "server": "node server/index.js",
+    "client": "node cli/index.js",
+    "start": "node server/index.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0",
+    "chalk": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

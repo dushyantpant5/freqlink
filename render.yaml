@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: freqlink-relay
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server/index.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MAX_PEERS_PER_FREQ
+        value: "50"
+      - key: HEARTBEAT_INTERVAL
+        value: "30000"
