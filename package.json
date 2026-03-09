@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "Terminal-based encrypted messaging over frequency-based channels",
   "type": "module",
-  "main": "cli/index.js",
+  "main": "server/index.js",
+  "bin": {
+    "freqlink": "cli/index.js"
+  },
   "scripts": {
     "server": "node server/index.js",
     "client": "node cli/index.js",

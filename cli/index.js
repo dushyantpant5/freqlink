@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * FreqLink CLI entry point.
  *
@@ -27,7 +28,7 @@ import {
 } from './ui.js';
 import { PEER } from '../shared/constants.js';
 
-const SERVER_URL = process.env.FREQLINK_SERVER ?? 'ws://localhost:3200';
+const SERVER_URL = process.env.FREQLINK_SERVER ?? 'wss://freqlink.onrender.com';
 
 // ─── Session state ────────────────────────────────────────────────────────────
 
