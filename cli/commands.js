@@ -296,35 +296,31 @@ export function createCommandHandler({ connection, state, setPrompt, quit }) {
       return;
     }
 
-    // Encrypt for each peer (broadcast burn — encrypt for each peer separately)
-    // Since this is a broadcast, we need a shared key. Use the first peer's key,
-    // or if multiple peers, send individual encrypted burns.
     const peerNames = Array.from(state.sessionKeys.keys());
     if (peerNames.length === 0) {
       printError('No peers on this frequency.');
       return;
     }
 
-    // For broadcast burn, encrypt with first peer's key and send to all.
-    // In a real multi-peer scenario, you'd need per-peer encryption.
-    // For now, encrypt once and broadcast (all peers derive same key via ECDH+passphrase).
-    const firstKey = getEffectiveKey(peerNames[0]);
-    if (!firstKey) {
-      printError('No session key available.');
-      return;
+    // Encrypt individually per peer so each pair's key is used correctly.
+    let sent = false;
+    for (const peerName of peerNames) {
+      const key = getEffectiveKey(peerName);
+      if (!key) continue;
+      try {
+        const payload = encryptToBase64(messageText, key);
+        connection.send({
+          type: MessageType.BURN,
+          payload,
+          ttl,
+          targetPeer: peerName,
+        });
+        sent = true;
+      } catch (err) {
+        printWarning(`Failed to encrypt burn for ${peerName}: ${err.message}`);
+      }
     }
-
-    try {
-      const payload = encryptToBase64(messageText, firstKey);
-      connection.send({
-        type: MessageType.BURN,
-        payload,
-        ttl,
-      });
-      printSystem(`⚠ BURN message sent (TTL: ${ttl}s)`);
-    } catch (err) {
-      printError(`Failed to send burn message: ${err.message}`);
-    }
+    if (sent) printSystem(`⚠ BURN message sent (TTL: ${ttl}s)`);
   }
 
   // ─── /quit ──────────────────────────────────────────────────────────────────
@@ -467,8 +463,10 @@ export function createCommandHandler({ connection, state, setPrompt, quit }) {
    * @param {string} challengeBase64
    */
   async function handleKeyVerifyChallenge(from, nonceBase64, challengeBase64) {
+    // Already settled — ignore duplicate challenges to prevent feedback loops
+    if (state.verifiedPeers.has(from) || state.mismatchedPeers.has(from)) return;
+
     if (!state.passphraseKey) {
-      // We don't have a passphrase key — mark as mismatch
       state.mismatchedPeers.add(from);
       return;
     }
@@ -482,17 +480,6 @@ export function createCommandHandler({ connection, state, setPrompt, quit }) {
       if (timingSafeEqual(ourChallenge, theirChallenge)) {
         state.verifiedPeers.add(from);
         printSuccess(`Key verified with ${from}`);
-
-        // Send our own challenge back
-        const ourNonce = randomBytes(32);
-        const ourChallengeForThem = computeKeyChallenge(state.passphraseKey, ourNonce);
-
-        connection.send({
-          type: MessageType.KEY_VERIFY,
-          target: from,
-          nonce: ourNonce.toString('base64'),
-          challenge: ourChallengeForThem.toString('base64'),
-        });
       } else {
         state.mismatchedPeers.add(from);
         printWarning(`Key mismatch with ${from} — they may be using a different passphrase`);

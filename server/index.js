@@ -178,11 +178,24 @@ function handleMessage(ws, peerId, rateLimiter, peerInfo, msg) {
     return;
   }
 
-  relay.broadcast(peerId, {
-    type: MessageType.MESSAGE,
-    from: peerInfo.peerName,
-    payload: msg.payload,
-  });
+  // If targetPeer is set, route only to that peer (per-pair encryption for 3+ peer groups).
+  // Otherwise fall back to broadcast.
+  if (typeof msg.targetPeer === 'string' && msg.targetPeer) {
+    const result = relay.sendDirect(peerId, msg.targetPeer, {
+      type: MessageType.MESSAGE,
+      from: peerInfo.peerName,
+      payload: msg.payload,
+    });
+    if (!result.success) {
+      sendError(ws, ErrorCode.PEER_NOT_FOUND, result.error);
+    }
+  } else {
+    relay.broadcast(peerId, {
+      type: MessageType.MESSAGE,
+      from: peerInfo.peerName,
+      payload: msg.payload,
+    });
+  }
 }
 
 function handleDM(ws, peerId, rateLimiter, peerInfo, msg) {
@@ -242,12 +255,21 @@ function handleBurn(ws, peerId, rateLimiter, peerInfo, msg) {
     return;
   }
 
-  relay.broadcast(peerId, {
-    type: MessageType.BURN,
-    from: peerInfo.peerName,
-    payload: msg.payload,
-    ttl,
-  });
+  if (typeof msg.targetPeer === 'string' && msg.targetPeer) {
+    relay.sendDirect(peerId, msg.targetPeer, {
+      type: MessageType.BURN,
+      from: peerInfo.peerName,
+      payload: msg.payload,
+      ttl,
+    });
+  } else {
+    relay.broadcast(peerId, {
+      type: MessageType.BURN,
+      from: peerInfo.peerName,
+      payload: msg.payload,
+      ttl,
+    });
+  }
 }
 
 function handleKeyExchange(ws, peerId, peerInfo, msg) {
