@@ -10,6 +10,11 @@
  */
 
 import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import crypto from 'crypto';
 import { WebSocketServer } from 'ws';
 import { createRelay } from './relay.js';
@@ -37,6 +42,35 @@ const httpServer = http.createServer((req, res) => {
     }));
     return;
   }
+
+  if (req.method === 'GET' && req.url === '/install') {
+    const scriptPath = path.join(__dirname, '..', 'install.sh');
+    fs.readFile(scriptPath, 'utf8', (err, data) => {
+      if (err) {
+        res.writeHead(500);
+        res.end('Install script not found');
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end(data);
+    });
+    return;
+  }
+
+  if (req.method === 'GET' && req.url === '/install.ps1') {
+    const scriptPath = path.join(__dirname, '..', 'install.ps1');
+    fs.readFile(scriptPath, 'utf8', (err, data) => {
+      if (err) {
+        res.writeHead(500);
+        res.end('Install script not found');
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end(data);
+    });
+    return;
+  }
+
   res.writeHead(404);
   res.end();
 });

@@ -6,8 +6,19 @@ FreqLink is a peer-to-peer encrypted chat system that runs in your terminal. Pee
 
 ## Quick Start
 
-You need Node.js >= 18. No installation required — just run:
+Installs Node.js automatically if needed.
 
+**macOS / Linux**
+```bash
+curl -fsSL https://freqlink.onrender.com/install | bash
+```
+
+**Windows** (PowerShell)
+```powershell
+irm https://freqlink.onrender.com/install.ps1 | iex
+```
+
+**Already have Node.js >= 18?**
 ```bash
 npx freqlink
 ```
